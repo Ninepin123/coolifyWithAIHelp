@@ -23,6 +23,14 @@
                 <x-forms.input type="number" min="1" max="300" id="metadata.timeout" label="Request timeout (optional)"
                     placeholder="10" helper="Seconds to wait for each request. Increase it if your instance responds slowly." />
             </div>
+        @elseif ($integrationToken->isAiProvider())
+            <div class="grid gap-4 lg:grid-cols-2">
+                <x-forms.input id="metadata.model" label="Model (optional)"
+                    placeholder="{{ \App\Services\Ai\ChatCompletionClient::DEFAULT_MODEL }}" />
+                <x-forms.input id="metadata.base_url" label="Base URL (optional)"
+                    placeholder="{{ \App\Services\Ai\ChatCompletionClient::DEFAULT_BASE_URL }}"
+                    helper="Changing the base URL requires the API key again." />
+            </div>
         @elseif ($integrationToken->provider === 'vault')
             <div class="grid gap-4 lg:grid-cols-2">
                 <x-forms.input required id="metadata.base_url" label="Base URL"
@@ -65,6 +73,12 @@
                 <p class="px-2.5 pb-2 text-[11px] text-neutral-500 dark:text-fg-dim">
                     Create new DNS records with the Cloudflare proxy on (orange cloud), so the server IP is not public. Existing records keep their proxy status.
                 </p>
+            </div>
+        @elseif ($integrationToken->isAiProvider())
+            <div class="rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-[11px] leading-5 text-neutral-600 dark:border-white/[0.08] dark:bg-white/[0.025] dark:text-fg-dim">
+                <div class="font-medium text-black dark:text-fg">Capability: AI deployment assistant</div>
+                <p>Used to analyze failed deployments. Environment variable values and <code>.env</code> files are
+                    never sent to the provider.</p>
             </div>
         @else
             <div class="rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-[11px] leading-5 text-neutral-600 dark:border-white/[0.08] dark:bg-white/[0.025] dark:text-fg-dim">

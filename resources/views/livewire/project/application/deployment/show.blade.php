@@ -9,6 +9,12 @@
                 <x-application.configuration-sidebar :application="$application"
                     current-route="project.application.deployment.show" />
                 <div class="flex min-h-0 min-w-0 flex-col gap-4 xl:h-full xl:pt-px 2xl:grid 2xl:grid-cols-[30rem_minmax(0,1fr)] 2xl:items-start">
+                    @if (data_get($application_deployment_queue, 'status') === 'failed' && (int) data_get($application_deployment_queue, 'pull_request_id') === 0)
+                        <div class="min-w-0 2xl:col-start-1 2xl:row-start-1">
+                            <livewire:project.application.deployment.ai-assistant :application="$application"
+                                :deployment-uuid="$deployment_uuid" wire:key="ai-assistant-{{ $deployment_uuid }}" />
+                        </div>
+                    @endif
                     <livewire:project.application.deployment.index :embedded="true"
                         :project_uuid="$application->environment->project->uuid"
                         :environment_uuid="$application->environment->uuid"
@@ -282,7 +288,7 @@
                 this.deploymentFinishedCleanup = null;
             }
         }
-    }" @keydown.window="handleFindShortcut($event)" class="flex h-[calc(100dvh-8rem)] min-h-[32rem] w-full min-w-0 flex-col overflow-hidden xl:h-[32rem] xl:min-h-0 xl:flex-none 2xl:h-[calc(100dvh-10rem)] 2xl:min-h-[32rem]"
+    }" @keydown.window="handleFindShortcut($event)" class="flex h-[calc(100dvh-8rem)] min-h-[32rem] w-full min-w-0 flex-col overflow-hidden xl:h-[32rem] xl:min-h-0 xl:flex-none 2xl:col-start-2 2xl:row-span-2 2xl:row-start-1 2xl:h-[calc(100dvh-10rem)] 2xl:min-h-[32rem]"
         {{-- A sticky parent is a stacking context: drop it so the fullscreen logs cover the sidebar and topbar. --}}
         :class="fullscreen ? '' : '2xl:sticky 2xl:top-4'">
             <div id="screen" :class="fullscreen ? 'fullscreen flex flex-col' : 'mt-2 flex flex-1 min-h-0 flex-col overflow-hidden lg:mt-0'">

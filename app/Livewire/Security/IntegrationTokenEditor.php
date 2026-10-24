@@ -85,6 +85,10 @@ class IntegrationTokenEditor extends Component
             $rules['metadata.timeout'] = ['nullable', 'integer', 'min:1', 'max:300'];
         }
 
+        if ($this->integrationToken->isAiProvider()) {
+            $rules = array_merge($rules, IntegrationToken::aiMetadataRules());
+        }
+
         return $rules;
     }
 
@@ -196,6 +200,7 @@ class IntegrationTokenEditor extends Component
         return match ($provider) {
             'vault' => ['base_url', 'namespace'],
             'infisical' => ['base_url', 'client_id'],
+            'deepseek' => ['base_url'],
             default => [],
         };
     }
@@ -237,6 +242,7 @@ class IntegrationTokenEditor extends Component
         return match ($provider) {
             'infisical' => 'Enter the client secret again when you change the base URL or the client ID.',
             'vault' => 'Enter the token again when you change the base URL or the namespace.',
+            'deepseek' => 'Enter the API key again when you change the base URL.',
             default => 'Enter the token again when you change the connection settings.',
         };
     }
