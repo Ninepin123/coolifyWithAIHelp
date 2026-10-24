@@ -98,6 +98,7 @@ class ApplicationSetting extends Model
         'include_coolify_default_variables' => 'boolean',
         'redact_all_env_values_in_logs' => 'boolean',
         'disable_build_cache' => 'boolean',
+        'is_ai_auto_fix_enabled' => 'boolean',
     ];
 
     protected $fillable = [
@@ -142,6 +143,7 @@ class ApplicationSetting extends Model
         'include_source_commit_in_build',
         'docker_images_to_keep',
         'stop_grace_period',
+        'is_ai_auto_fix_enabled',
     ];
 
     /**

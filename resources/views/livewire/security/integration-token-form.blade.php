@@ -5,6 +5,7 @@
             ['value' => 'doppler', 'label' => 'Doppler'],
             ['value' => 'infisical', 'label' => 'Infisical'],
             ['value' => 'vault', 'label' => 'HashiCorp Vault'],
+            ['value' => 'deepseek', 'label' => 'DeepSeek (AI deployment assistant)'],
         ]" />
 
         @if ($provider === 'infisical')
@@ -19,6 +20,18 @@
                     helper="Use the URL of your self-hosted Infisical instance, or the Infisical cloud URL." />
                 <x-forms.input type="number" min="1" max="300" id="metadata.timeout" label="Request timeout (optional)"
                     placeholder="10" helper="Seconds to wait for each request. Increase it if your instance responds slowly." />
+            </div>
+        @elseif ($provider === 'deepseek')
+            <div class="grid gap-4 lg:grid-cols-2">
+                <x-forms.input required id="name" label="Token name" placeholder="DeepSeek" />
+                <x-forms.input required type="password" id="token" label="API key"
+                    placeholder="sk-..." />
+                <x-forms.input id="metadata.model" label="Model (optional)"
+                    placeholder="{{ \App\Services\Ai\ChatCompletionClient::DEFAULT_MODEL }}"
+                    helper="Model name sent to the API. Leave blank for {{ \App\Services\Ai\ChatCompletionClient::DEFAULT_MODEL }}." />
+                <x-forms.input id="metadata.base_url" label="Base URL (optional)"
+                    placeholder="{{ \App\Services\Ai\ChatCompletionClient::DEFAULT_BASE_URL }}"
+                    helper="HTTPS URL of an OpenAI-compatible chat completions API. Leave blank for DeepSeek." />
             </div>
         @else
             <div class="grid gap-4 lg:grid-cols-2">
@@ -73,6 +86,14 @@
                 <p class="px-2.5 pb-2 text-[11px] text-neutral-500 dark:text-fg-dim">
                     Create new DNS records with the Cloudflare proxy on (orange cloud), so the server IP is not public. Existing records keep their proxy status.
                 </p>
+            </div>
+        @elseif ($provider === 'deepseek')
+            <div class="rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-[11px] leading-5 text-neutral-600 dark:border-white/[0.08] dark:bg-white/[0.025] dark:text-fg-dim">
+                <div class="font-medium text-black dark:text-fg">Capability: AI deployment assistant</div>
+                <p>When a deployment fails and you ask for help (or turn on automatic fixes for an application),
+                    Coolify sends the file list of the repository, selected build files, the current build settings,
+                    the names of the environment variables, and the deployment log with secrets hidden to this
+                    provider. Environment variable values and <code>.env</code> files are never sent.</p>
             </div>
         @else
             <div class="rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-[11px] leading-5 text-neutral-600 dark:border-white/[0.08] dark:bg-white/[0.025] dark:text-fg-dim">

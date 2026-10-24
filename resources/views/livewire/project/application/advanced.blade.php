@@ -251,5 +251,9 @@
             @endif
         </x-application.settings-section>
 
+        @if ($application->git_based())
+            <livewire:project.application.ai-assistant-settings :application="$application"
+                wire:key="ai-assistant-settings-{{ $application->uuid }}" />
+        @endif
     </div>
 </div>

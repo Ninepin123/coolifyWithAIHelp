@@ -41,6 +41,9 @@ class IntegrationTokenForm extends Component
             $this->metadata = [];
             $this->automaticDns = true;
             $this->proxiedDns = false;
+        } elseif (in_array($this->provider, IntegrationToken::AI_PROVIDERS, true)) {
+            $this->capabilities = ['ai'];
+            $this->metadata = [];
         } else {
             $this->capabilities = ['secrets'];
             $this->metadata = $this->provider === 'infisical'
@@ -89,6 +92,10 @@ class IntegrationTokenForm extends Component
             $rules['metadata.base_url'] = ['required', 'url:http,https'];
             $rules['metadata.namespace'] = ['nullable', 'string'];
             $rules['metadata.timeout'] = ['nullable', 'integer', 'min:1', 'max:300'];
+        }
+
+        if (in_array($this->provider, IntegrationToken::AI_PROVIDERS, true)) {
+            $rules = array_merge($rules, IntegrationToken::aiMetadataRules());
         }
 
         return $rules;

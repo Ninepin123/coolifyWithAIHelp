@@ -12,11 +12,17 @@ class IntegrationToken extends BaseModel
 
     public const SECRET_MANAGER_PROVIDERS = ['doppler', 'infisical', 'vault'];
 
+    /**
+     * Providers of the AI deployment assistant. They use the OpenAI-compatible chat completions API.
+     */
+    public const AI_PROVIDERS = ['deepseek'];
+
     public const PROVIDER_NAMES = [
         'cloudflare' => 'Cloudflare',
         'doppler' => 'Doppler',
         'infisical' => 'Infisical',
         'vault' => 'HashiCorp Vault',
+        'deepseek' => 'DeepSeek',
     ];
 
     protected $fillable = [
@@ -66,6 +72,23 @@ class IntegrationToken extends BaseModel
         return in_array($this->provider, self::SECRET_MANAGER_PROVIDERS, true);
     }
 
+    public function isAiProvider(): bool
+    {
+        return in_array($this->provider, self::AI_PROVIDERS, true);
+    }
+
+    /**
+     * The newest AI token of a team, which the AI deployment assistant uses for the team's resources.
+     */
+    public static function aiTokenForTeam(int $teamId): ?self
+    {
+        return self::query()
+            ->where('team_id', $teamId)
+            ->whereIn('provider', self::AI_PROVIDERS)
+            ->latest('id')
+            ->first();
+    }
+
     public function providerName(): string
     {
         return self::PROVIDER_NAMES[$this->provider] ?? ucfirst($this->provider);
@@ -78,7 +101,25 @@ class IntegrationToken extends BaseModel
      */
     public static function allowedCapabilities(string $provider): array
     {
-        return $provider === 'cloudflare' ? ['dns', 'tunnel'] : ['secrets'];
+        return match (true) {
+            $provider === 'cloudflare' => ['dns', 'tunnel'],
+            in_array($provider, self::AI_PROVIDERS, true) => ['ai'],
+            default => ['secrets'],
+        };
+    }
+
+    /**
+     * Validation rules for the metadata of an AI token. The base URL must use HTTPS because the API key
+     * is sent to it with every request.
+     *
+     * @return array<string, array<int, string>>
+     */
+    public static function aiMetadataRules(): array
+    {
+        return [
+            'metadata.base_url' => ['nullable', 'url:https', 'max:255'],
+            'metadata.model' => ['nullable', 'string', 'max:100', 'regex:/^[A-Za-z0-9][A-Za-z0-9._:\/-]*$/'],
+        ];
     }
 
     /**

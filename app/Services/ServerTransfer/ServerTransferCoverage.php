@@ -2,6 +2,7 @@
 
 namespace App\Services\ServerTransfer;
 
+use App\Models\AiDeploymentAttempt;
 use App\Models\Application;
 use App\Models\ApplicationDeploymentQueue;
 use App\Models\ApplicationPreview;
@@ -349,5 +350,6 @@ final class ServerTransferCoverage
         VolumeBackupS3Replica::class => 'Backup history.',
         DockerCleanupExecution::class => 'Execution history.',
         GithubRunnerExecution::class => 'Execution history. The source stops tracking the runners of the server when it is transferred.',
+        AiDeploymentAttempt::class => 'History of AI deployment assistant requests. Applied plans are already in the application settings and generated build files, which move.',
     ];
 }

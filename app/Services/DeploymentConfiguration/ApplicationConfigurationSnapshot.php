@@ -167,6 +167,7 @@ class ApplicationConfigurationSnapshot
             // from git on every parse (resolved env, generated labels, deployment context),
             // so comparing it would flag a permanent change for git-based compose apps.
             $this->item('docker_compose_raw', 'Docker Compose', $this->application->docker_compose_raw, 'build', displayValue: $this->summarizeText($this->application->docker_compose_raw), displayFull: $this->application->docker_compose_raw, diffMode: 'lines'),
+            $this->item('ai_build_files', 'AI generated build files', $this->aiBuildFilesText(), 'build', displayValue: $this->aiBuildFilesSummary(), displayFull: $this->aiBuildFilesText(), diffMode: 'lines'),
             $this->item('docker_compose_custom_build_command', 'Docker Compose custom build command', $this->application->docker_compose_custom_build_command, 'build'),
             $this->item('is_git_submodules_enabled', 'Git submodules', data_get($this->application, 'settings.is_git_submodules_enabled'), 'build'),
             $this->item('is_git_lfs_enabled', 'Git LFS', data_get($this->application, 'settings.is_git_lfs_enabled'), 'build'),
@@ -419,6 +420,29 @@ class ApplicationConfigurationSnapshot
             'display_value' => $displayValue ?? $this->displayValue($normalizedValue),
             'display_full' => $sensitive ? null : $this->expandableText($displayFull ?? $this->stringifyValue($normalizedValue)),
         ];
+    }
+
+    /**
+     * The generated build files as one text, so a changed line shows in the diff.
+     */
+    private function aiBuildFilesText(): ?string
+    {
+        $files = $this->application->aiBuildFiles();
+        if ($files === []) {
+            return null;
+        }
+
+        return collect($files)
+            ->sortBy('path')
+            ->map(fn (array $file): string => "# {$file['path']}\n{$file['content']}")
+            ->implode("\n");
+    }
+
+    private function aiBuildFilesSummary(): string
+    {
+        $paths = collect($this->application->aiBuildFiles())->pluck('path')->sort()->values();
+
+        return $paths->isEmpty() ? '-' : $paths->implode(', ');
     }
 
     private function environmentDisplayValue(EnvironmentVariable $environmentVariable): string
